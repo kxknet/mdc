@@ -1,0 +1,50 @@
+version: '3.5'
+services:
+  qdate-web:
+    container_name: lara-web
+    image: 'webdevops/php-apache:debian-10'
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - PHP_MEMORY_LIMIT=1024M
+      - PHP_MAX_EXECUTION_TIME=7200
+      - PHP_POST_MAX_SIZE=10240M
+      - PHP_UPLOAD_MAX_FILESIZE=10240M
+      - FPM_MAX_REQUESTS=500
+      - FPM_PM_MAX_CHILDREN=20
+      - FPM_PM_START_SERVERS=10
+      - FPM_PM_MIN_SPARE_SERVERS=5
+      - FPM_PM_MAX_SPARE_SERVERS=15
+    labels:
+      - 'traefik.frontend.rule=Host:wow.233.fi'
+    volumes:
+      - './lara:/app'
+    restart: unless-stopped
+  wowonder-db:
+    container_name: lara-db
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=444gfgfhgh567656576GHfhgj
+      - MYSQL_PASSWORD=fhbggjjg6667yi7yj76j
+      - MYSQL_DATABASE=lara
+      - MYSQL_USER=larau
+    labels:
+      - traefik.enable=false
+    volumes:
+      - './db:/var/lib/mysql'
+    command: '--sql-mode="NO_ENGINE_SUBSTITUTION"'
+    restart: unless-stopped
+  caddy:
+    image: 'abiosoft/caddy:no-stats'
+    volumes:
+      - './caddy/Caddyfile:/etc/Caddyfile'
+      - './caddy/.caddy:/root/.caddy'
+      - './caddy/conf/:/root/conf/'
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      - ACME_AGREE=true
+networks:
+  default:
+    external:
+      name: imlala
